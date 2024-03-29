@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import SubscribeBanner from "../components/SubscribeBanner";
+import SubscribeBanner from "../Components/SubscribeBanner";
 
 const Home: React.FC = () => {
   const mailListUrl =
