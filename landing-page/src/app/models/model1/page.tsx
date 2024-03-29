@@ -31,6 +31,10 @@ const Model1: React.FC = () => {
       <SubscribeBanner mailListUrl={mailListUrl} />
       <div className="flex-grow flex justify-center items-center">
         <div className="max-w-2xl w-full">
+          <div className="bg-gray-800 text-white py-2 px-4 rounded-t-md">
+            <h2 className="text-lg font-semibold">Model 1</h2>
+            <p className="text-sm">For now I'm just a repeating bot</p>
+          </div>
           <div className="flex flex-col h-96 overflow-y-auto p-4 bg-gray-200 rounded-t-md">
             {messages.map((message, index) => (
               <div
@@ -53,7 +57,7 @@ const Model1: React.FC = () => {
               value={inputValue}
               onChange={handleInputChange}
               placeholder="Enter your prompt"
-              className="flex-grow mr-4 p-2 border border-gray-300 rounded"
+              className="flex-grow mr-4 p-2 border border-gray-300 rounded text-black"
               rows={3}
             />
             <button
