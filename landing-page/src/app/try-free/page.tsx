@@ -20,7 +20,7 @@ const TryFree: React.FC = () => {
             <div className="text-center">
               <span> Model 1</span>
             </div>
-            <span className="text-sm">text-to-image</span>
+            <span className="text-sm">text-to-text</span>
           </Link>
           <Link
             href="/models/model2"

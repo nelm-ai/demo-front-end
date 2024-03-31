@@ -3,6 +3,7 @@
 
 import React, { useState } from "react";
 import SubscribeBanner from "@/Components/SubscribeBanner";
+import ModelButtons from "@/Components/ModelButton";
 
 const Model2: React.FC = () => {
   const mailListUrl =
@@ -36,6 +37,7 @@ const Model2: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <SubscribeBanner mailListUrl={mailListUrl} />
+      <ModelButtons />
       <div className="flex-grow flex justify-center items-center">
         <div className="max-w-2xl w-full">
           <div className="bg-gray-800 text-white py-2 px-4 rounded-t-md">
