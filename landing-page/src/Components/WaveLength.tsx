@@ -1,10 +1,18 @@
-"use client"; // This is a client component 👈🏽
-
-import React, { useEffect, useRef } from "react";
+"use client";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const WaveAnimation = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [isHoveringWave, setIsHoveringWave] = useState(false);
+
+  const handleMouseMove = useCallback((event: MouseEvent) => {
+    setCursorPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,6 +38,20 @@ const WaveAnimation = () => {
           canvas.height / 2 +
           Math.sin((i / wavelength) * Math.PI + offset) * amplitude;
 
+        // Calculate distance between cursor and point on the wave
+        const distance = Math.sqrt(
+          (i - cursorPosition.x) ** 2 + (y - cursorPosition.y) ** 2
+        );
+
+        // Check if cursor is within a certain distance from the wave
+        if (distance < 50) {
+          setIsHoveringWave(true);
+          ctx.strokeStyle = "rgba(255, 0, 0, 0.5)"; // Red color
+        } else {
+          setIsHoveringWave(false);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; // Default color
+        }
+
         if (Math.random() < 0.02) {
           y += Math.random() * 20 - 10;
         }
@@ -41,10 +63,11 @@ const WaveAnimation = () => {
         }
       }
 
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.stroke();
       offset += -0.02;
     };
+
+    canvas.addEventListener("mousemove", handleMouseMove);
 
     animate();
 
@@ -53,8 +76,9 @@ const WaveAnimation = () => {
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      canvas.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [handleMouseMove]);
 
   return (
     <canvas
@@ -66,6 +90,7 @@ const WaveAnimation = () => {
         width: "100vw",
         height: "100vh",
         zIndex: -1,
+        cursor: isHoveringWave ? "pointer" : "default",
       }}
     />
   );
