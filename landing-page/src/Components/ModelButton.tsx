@@ -6,10 +6,10 @@ const ModelButtons = () => {
   const pathname = usePathname();
 
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center mt-4 space-x-4">
       <Link href="/models/model1">
         <button
-          className={`bg-gray-800 text-white px-4 py-2 rounded mr-4 hover:bg-gray-700 ${
+          className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${
             pathname === "/models/model1" ? "cursor-not-allowed opacity-50" : ""
           }`}
           disabled={pathname === "/models/model1"}
@@ -25,6 +25,16 @@ const ModelButtons = () => {
           disabled={pathname === "/models/model2"}
         >
           Model 2
+        </button>
+      </Link>
+      <Link href="/phi">
+        <button
+          className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${
+            pathname === "/phi" ? "cursor-not-allowed opacity-50" : ""
+          }`}
+          disabled={pathname === "/phi"}
+        >
+          Phi
         </button>
       </Link>
     </div>
