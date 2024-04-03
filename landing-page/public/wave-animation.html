@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animated Glitch Wave</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: black; /* Set background color to black */
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="wave"></canvas>
+    <script>
+      const canvas = document.getElementById("wave");
+      const ctx = canvas.getContext("2d");
+
+      // Set canvas dimensions
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Wave properties
+      const wavelength = 100; // Adjust the wavelength of the wave
+      const amplitude = 50; // Adjust the amplitude of the wave
+      let offset = 0;
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw wave
+        ctx.beginPath();
+        for (let i = 0; i < canvas.width; i++) {
+          let y =
+            canvas.height / 2 +
+            Math.sin((i / wavelength) * Math.PI + offset) * amplitude;
+
+          // Add glitch effect
+          if (Math.random() < 0.02) {
+            // Probability of glitch effect
+            y += Math.random() * 20 - 10; // Random distortion
+          }
+
+          if (i === 0) {
+            ctx.moveTo(i, y);
+          } else {
+            ctx.lineTo(i, y);
+          }
+        }
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; // Adjust wave color and opacity
+        ctx.stroke();
+
+        // Update offset for animation
+        offset += -0.02; // Adjust horizontal speed
+      }
+
+      animate();
+    </script>
+  </body>
+</html>

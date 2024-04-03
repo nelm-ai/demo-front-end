@@ -1,0 +1,30 @@
+[package]
+name = "phi-candle-wasm-example"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+candle = {git = "https://github.com/huggingface/candle.git", package = "candle-core", version = "0.4.2" }
+candle-nn = { git = "https://github.com/huggingface/candle.git", package = "candle-nn", version = "0.4.2" }
+candle-transformers = { git = "https://github.com/huggingface/candle.git", package = "candle-transformers", version = "0.4.2" }
+tokenizers = { version = "0.15.0", default-features = false, features = ["unstable_wasm"] }
+num-traits = "0.2.15"
+
+# App crates
+anyhow = { version = "1", features = ["backtrace"] }
+byteorder = "1.4.3"
+getrandom = { version = "0.2.8", features = ["js"] }
+image = { version = "0.25.0", default-features = false, features = ["jpeg", "png"] }
+log = "0.4"
+safetensors = "0.4.1"
+serde = { version = "1.0.171", features = ["derive"] }
+serde_json = "1.0.99"
+
+# Wasm specific crates
+console_error_panic_hook = "0.1.7"
+wasm-bindgen = "0.2.87"
+js-sys = "0.3.64"
+
+
