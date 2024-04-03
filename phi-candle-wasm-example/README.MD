@@ -13,7 +13,3 @@ import init, { Model } from "./build/m.js";
 ```
 
 All needed assets are fetched from the web, so no need to download anything. Finally, you can preview the example by running a local HTTP server. For example:
-
-
-
-
