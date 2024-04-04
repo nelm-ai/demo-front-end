@@ -38,6 +38,15 @@ const TryFree: React.FC = () => {
             </div>
             <span className="text-sm">text-to-text</span>
           </Link>
+          <Link
+            href="/petals"
+            className="bg-gray-800 text-white px-6 py-3 rounded-md  hover:bg-gray-700 "
+          >
+            <div className="text-center">
+              <span> Petals </span>
+            </div>
+            <span className="text-sm">text-to-text</span>
+          </Link>
         </div>
         <div className="text-center">
           {/* Add your try-free page content here */}

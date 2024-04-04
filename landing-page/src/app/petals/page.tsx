@@ -83,7 +83,8 @@ const Petals: React.FC = () => {
           <div className="bg-gray-800 text-white py-2 px-4 rounded-t-md">
             <h2 className="text-lg font-semibold">Petals</h2>
             <p className="text-sm">
-              We are connecting to the Petal network to run these inferences.
+              We are connecting to the Petal network to run these inferences
+              using the Stable Beluga2 model.
             </p>
           </div>
           <div className="flex flex-col h-96 overflow-y-auto p-4 bg-gray-200 rounded-t-md">
