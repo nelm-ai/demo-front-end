@@ -16,7 +16,8 @@
     "react-dom": "^18",
     "react-lottie": "^1.2.4",
     "snarkdown": "^2.0.0",
-    "stable": "^0.1.8"
+    "stable": "^0.1.8",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/node": "^20",

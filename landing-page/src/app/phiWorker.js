@@ -134,6 +134,17 @@ async function generate(data) {
           });
           return;
         }
+        // Check if the token is a sentence-ending punctuation
+        const sentenceEnders = [".", "!", "?"];
+        if (sentenceEnders.includes(token)) {
+          sentence += token;
+          self.postMessage({
+            status: "complete",
+            message: "complete",
+            output: prompt + sentence,
+          });
+          return;
+        }
         const tokensSec =
           ((tokensCount + 1) / (performance.now() - startTime)) * 1000;
 
