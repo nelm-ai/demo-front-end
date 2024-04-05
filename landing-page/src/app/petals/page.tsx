@@ -28,6 +28,10 @@ const Petals: React.FC = () => {
         }
       } else {
         console.error("Error:", response.traceback);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: "bot", text: "Error: " + response.traceback },
+        ]);
       }
     };
     newWs.onclose = () => {
