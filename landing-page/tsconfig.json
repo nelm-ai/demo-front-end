@@ -26,7 +26,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/phiWorker.js"
+    "src/app/workers/phiWorker.js"
   ],
   "exclude": ["node_modules"]
 }

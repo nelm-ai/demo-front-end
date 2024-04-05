@@ -1,4 +1,5 @@
-import init, { Model } from "../../../phi-candle-wasm-example/build/m.js";
+// This code is from the candle wasm examples repo
+import init, { Model } from "../../../../phi-candle-wasm-example/build/m.js";
 
 async function fetchArrayBuffer(url) {
   const cacheName = "phi-mixformer-candle-cache";
