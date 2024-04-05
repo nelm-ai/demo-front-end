@@ -82,6 +82,9 @@ const Yolo: React.FC = () => {
   const [confidence, setConfidence] = useState(0.25);
   const [iouThreshold, setIouThreshold] = useState(0.45);
   const [isDetecting, setIsDetecting] = useState(false);
+  const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(
+    null
+  );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasResultRef = useRef<HTMLCanvasElement>(null);
@@ -104,6 +107,7 @@ const Yolo: React.FC = () => {
         setGeneratedImage(e.data.imageURL);
         console.log("new image generated");
         setIsDetecting(false);
+        setHasImage(false);
       }
     };
 
@@ -115,9 +119,11 @@ const Yolo: React.FC = () => {
   }, []);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("file", event.target.files);
     if (event.target.files && event.target.files.length > 0) {
       setImage(event.target.files[0]);
       drawImageCanvas(URL.createObjectURL(event.target.files[0]));
+      setHasImage(true); // Move this line here
     }
   };
 
@@ -337,7 +343,14 @@ const Yolo: React.FC = () => {
               <div className="py-1">
                 <button
                   className="text-xs text-black bg-white rounded-md disabled:opacity-50 flex gap-1 items-center ml-auto"
-                  onClick={() => drawImageCanvas("")}
+                  onClick={() => {
+                    drawImageCanvas("");
+                    setImage(null);
+                    setHasImage(false);
+                    if (fileInputRef && fileInputRef.value) {
+                      fileInputRef.value = "";
+                    }
+                  }}
                 >
                   <svg
                     className=""
@@ -387,6 +400,7 @@ const Yolo: React.FC = () => {
                     type="file"
                     className="sr-only"
                     onChange={handleImageChange}
+                    ref={(input) => setFileInputRef(input)}
                   />
                 </div>
                 <canvas
