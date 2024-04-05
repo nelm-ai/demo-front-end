@@ -37,6 +37,16 @@ const ModelButtons = () => {
           Phi
         </button>
       </Link>
+      <Link href="/yolo">
+        <button
+          className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${
+            pathname === "/yolo" ? "cursor-not-allowed opacity-50" : ""
+          }`}
+          disabled={pathname === "/yolo"}
+        >
+          Yolo
+        </button>
+      </Link>
       <Link href="/petals">
         <button
           className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${

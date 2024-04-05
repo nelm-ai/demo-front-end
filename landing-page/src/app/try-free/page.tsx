@@ -39,6 +39,15 @@ const TryFree: React.FC = () => {
             <span className="text-sm">text-to-text</span>
           </Link>
           <Link
+            href="/yolo"
+            className="bg-gray-800 text-white px-6 py-3 rounded-md  hover:bg-gray-700 "
+          >
+            <div className="text-center">
+              <span> Yolo</span>
+            </div>
+            <span className="text-sm">Image classifier</span>
+          </Link>
+          <Link
             href="/petals"
             className="bg-gray-800 text-white px-6 py-3 rounded-md  hover:bg-gray-700 "
           >
