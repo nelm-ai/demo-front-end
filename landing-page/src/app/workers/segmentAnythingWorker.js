@@ -1,5 +1,5 @@
 //load the candle SAM Model wasm module
-import init, { Model } from "../../wasmBinaries/build/m.js";
+import init, { Model } from "../../wasmBinaries/segmentAnything/build/m.js";
 
 async function fetchArrayBuffer(url, cacheModel = true) {
   if (!cacheModel)

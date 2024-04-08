@@ -24,8 +24,27 @@ const Home: React.FC = () => {
   const imagesExamplesRef = useRef<HTMLDivElement>(null);
   const modelSelectionRef = useRef<HTMLSelectElement>(null);
   const statusOutputRef = useRef<HTMLSpanElement>(null);
+  const MODEL_BASEURL = "https://huggingface.co/lmz/candle-sam/resolve/main/";
+  const MODELS = {
+    sam_mobile_tiny: {
+      url: "mobile_sam-tiny-vitt.safetensors",
+    },
+    sam_base: {
+      url: "sam_vit_b_01ec64.safetensors",
+    },
+  };
+
+  const samWorker = useRef<Worker | null>(null);
 
   useEffect(() => {
+    if (!samWorker.current) {
+      samWorker.current = new Worker(
+        new URL("../workers/segmentAnythingWorker.js", import.meta.url),
+        {
+          type: "module",
+        }
+      );
+    }
     ctxCanvasRef.current = canvasRef.current.getContext("2d");
     ctxMaskRef.current = maskRef.current.getContext("2d");
   }, []);
@@ -88,48 +107,57 @@ const Home: React.FC = () => {
   };
 
   const drawMask = (maskURL, points) => {
-    if (!maskURL) {
-      throw new Error("No mask URL provided");
-    }
-
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-
-    img.onload = () => {
-      maskRef.current.width = canvasRef.current.width;
-      maskRef.current.height = canvasRef.current.height;
-      ctxMaskRef.current.save();
-      ctxMaskRef.current.drawImage(canvasRef.current, 0, 0);
-      ctxMaskRef.current.globalCompositeOperation = "source-atop";
-      ctxMaskRef.current.fillStyle = "rgba(255, 0, 0, 0.6)";
-      ctxMaskRef.current.fillRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-      ctxMaskRef.current.globalCompositeOperation = "destination-in";
-      ctxMaskRef.current.drawImage(img, 0, 0);
-      ctxMaskRef.current.globalCompositeOperation = "source-over";
-      for (const pt of points) {
-        if (pt[2]) {
-          ctxMaskRef.current.fillStyle = "rgba(0, 255, 255, 1)";
-        } else {
-          ctxMaskRef.current.fillStyle = "rgba(255, 255, 0, 1)";
-        }
-        ctxMaskRef.current.beginPath();
-        ctxMaskRef.current.arc(
-          pt[0] * canvasRef.current.width,
-          pt[1] * canvasRef.current.height,
-          3,
-          0,
-          2 * Math.PI
-        );
-        ctxMaskRef.current.fill();
+    return new Promise((resolve, reject) => {
+      if (!maskURL) {
+        reject(new Error("No mask URL provided"));
+        return;
       }
-      ctxMaskRef.current.restore();
-    };
-    img.src = maskURL;
+
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+
+      img.onload = () => {
+        maskRef.current.width = canvasRef.current.width;
+        maskRef.current.height = canvasRef.current.height;
+        ctxMaskRef.current.save();
+        ctxMaskRef.current.drawImage(canvasRef.current, 0, 0);
+        ctxMaskRef.current.globalCompositeOperation = "source-atop";
+        ctxMaskRef.current.fillStyle = "rgba(255, 0, 0, 0.6)";
+        ctxMaskRef.current.fillRect(
+          0,
+          0,
+          canvasRef.current.width,
+          canvasRef.current.height
+        );
+        ctxMaskRef.current.globalCompositeOperation = "destination-in";
+        ctxMaskRef.current.drawImage(img, 0, 0);
+        ctxMaskRef.current.globalCompositeOperation = "source-over";
+        for (const pt of points) {
+          if (pt[2]) {
+            ctxMaskRef.current.fillStyle = "rgba(0, 255, 255, 1)";
+          } else {
+            ctxMaskRef.current.fillStyle = "rgba(255, 255, 0, 1)";
+          }
+          ctxMaskRef.current.beginPath();
+          ctxMaskRef.current.arc(
+            pt[0] * canvasRef.current.width,
+            pt[1] * canvasRef.current.height,
+            3,
+            0,
+            2 * Math.PI
+          );
+          ctxMaskRef.current.fill();
+        }
+        ctxMaskRef.current.restore();
+        resolve(); // Resolve the Promise once the mask has been drawn
+      };
+
+      img.onerror = () => {
+        reject(new Error("Failed to load mask image"));
+      };
+
+      img.src = maskURL;
+    });
   };
 
   const drawImageCanvas = (imgURL) => {
@@ -150,7 +178,7 @@ const Home: React.FC = () => {
       canvasRef.current.height
     );
 
-    const img = new Image();
+    const img = document.createElement("img");
     img.crossOrigin = "anonymous";
 
     img.onload = () => {
@@ -219,7 +247,7 @@ const Home: React.FC = () => {
     const { maskURL } = await getSegmentationMask(updatedPoints);
     setIsSegmenting(false);
     setCopyMaskURL(maskURL);
-    drawMask(maskURL, updatedPoints);
+    await drawMask(maskURL, updatedPoints);
   };
 
   const handleCanvasClick = async (event) => {
@@ -327,7 +355,8 @@ const Home: React.FC = () => {
   const handleDownload = async () => {
     const loadImageAsync = (imageURL) => {
       return new Promise((resolve) => {
-        const img = new Image();
+        // const img = new HTMLImageElement();
+        const img = document.createElement("img");
         img.onload = () => {
           resolve(img);
         };
@@ -416,9 +445,10 @@ const Home: React.FC = () => {
                 <select
                   id="model"
                   ref={modelSelectionRef}
+                  defaultValue="sam_mobile_tiny"
                   className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
-                  <option value="sam_mobile_tiny" selected>
+                  <option value="sam_mobile_tiny">
                     Mobile SAM Tiny (40.6 MB)
                   </option>
                   <option value="sam_base">SAM Base (375 MB)</option>
