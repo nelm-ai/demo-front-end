@@ -3,8 +3,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import SubscribeBanner from "@/Components/SubscribeBanner";
+import ModelButtons from "@/Components/ModelButton";
 
 const Home: React.FC = () => {
+  const mailListUrl =
+    "https://docs.google.com/forms/d/e/1FAIpQLScDUUi878bC2WxMHkMmNm5_T-CZNuHK1zQeYoihjYlIlQhnBg/viewform?usp=sf_link";
   const [hasImage, setHasImage] = useState(false);
   const [isSegmenting, setIsSegmenting] = useState(false);
   const [isEmbedding, setIsEmbedding] = useState(false);
@@ -396,54 +400,20 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Head>
-        <title>Candle Segment Anything Model (SAM) Rust/WASM</title>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@200;300;400&family=Source+Sans+3:wght@100;200;300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
       <div className="min-h-screen flex flex-col">
+        <SubscribeBanner mailListUrl={mailListUrl} />
+        <ModelButtons />
         <main className="flex-grow flex justify-center items-center">
           <div className="max-w-2xl w-full">
             <div className="bg-gray-800 text-white py-2 px-4 rounded-t-md">
               <h1 className="text-lg font-semibold flex items-center">
-                <span className="text-3xl mr-2">🕯️</span> Candle Segment
-                Anything
+                Segment Anything
               </h1>
-              <h2 className="text-sm">Rust/WASM Demo</h2>
+              <h2 className="text-sm">
+                Segment any part of the image and cut it out.
+              </h2>
             </div>
-            <div className="flex flex-col p-4 bg-gray-200 rounded-b-md">
-              <p className="mb-4">
-                Zero-shot image segmentation with{" "}
-                <a
-                  href="https://segment-anything.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-blue-600 hover:text-blue-800"
-                >
-                  Segment Anything Model (SAM)
-                </a>{" "}
-                and{" "}
-                <a
-                  href="https://github.com/ChaoningZhang/MobileSAM"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-blue-600 hover:text-blue-800"
-                >
-                  MobileSAM{" "}
-                </a>
-                . It runs in the browser with a WASM runtime built with{" "}
-                <a
-                  href="https://github.com/huggingface/candle/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-blue-600 hover:text-blue-800"
-                >
-                  Candle
-                </a>
-                .
-              </p>
+            <div className="flex flex-col p-4 bg-gray-200 rounded-b-md text-black">
               <div className="mb-4">
                 <label htmlFor="model" className="block text-sm font-medium">
                   Models Options:{" "}
