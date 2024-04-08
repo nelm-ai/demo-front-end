@@ -94,6 +94,7 @@ const Home: React.FC = () => {
   };
 
   const clearImageCanvas = () => {
+    console.log("clearing");
     ctxCanvasRef.current.clearRect(
       0,
       0,
@@ -113,7 +114,11 @@ const Home: React.FC = () => {
     setPointArr([]);
     setCopyMaskURL(null);
     setCopyImageURL(null);
-    dropButtonsRef.current.classList.remove("invisible");
+    if (dropButtonsRef.current) {
+      dropButtonsRef.current.classList.remove("invisible");
+    } else {
+      console.log("Canvas contexts are not initialized");
+    }
   };
 
   const drawMask = (maskURL, points) => {
@@ -487,7 +492,6 @@ const Home: React.FC = () => {
                     </button>
                     <button
                       id="clear-btn"
-                      disabled
                       title="Clear Image"
                       className="text-xs bg-white rounded-md disabled:opacity-50 flex gap-1 items-center"
                       onClick={clearImageCanvas}
