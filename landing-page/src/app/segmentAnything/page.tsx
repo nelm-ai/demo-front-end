@@ -51,6 +51,12 @@ const Home: React.FC = () => {
 
   const segmentPoints = async (modelURL, modelID, imageURL, points) => {
     return new Promise((resolve, reject) => {
+      const samWorker = new Worker(
+        new URL("../workers/segmentAnythingWorker.js", import.meta.url),
+        {
+          type: "module",
+        }
+      );
       function messageHandler(event) {
         console.log(event.data);
         if ("status" in event.data) {
