@@ -7,7 +7,7 @@ const ModelButtons = () => {
 
   return (
     <div className="flex justify-center mt-4 space-x-4">
-      <Link href="/models/model1">
+      {/* <Link href="/models/model1">
         <button
           className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${
             pathname === "/models/model1" ? "cursor-not-allowed opacity-50" : ""
@@ -26,7 +26,7 @@ const ModelButtons = () => {
         >
           Model 2
         </button>
-      </Link>
+      </Link> */}
       <Link href="/phi">
         <button
           className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${
@@ -55,6 +55,18 @@ const ModelButtons = () => {
           disabled={pathname === "/petals"}
         >
           Petals
+        </button>
+      </Link>
+      <Link href="/segmentAnything">
+        <button
+          className={`bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 ${
+            pathname === "/segmentAnything"
+              ? "cursor-not-allowed opacity-50"
+              : ""
+          }`}
+          disabled={pathname === "/segmentAnything"}
+        >
+          Segment Anything
         </button>
       </Link>
     </div>

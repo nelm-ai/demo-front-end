@@ -13,7 +13,7 @@ const TryFree: React.FC = () => {
       <div className="flex-grow flex justify-center items-center flex-col">
         <h1 className="text-4xl font-bold mb-8">Choose a Model</h1>
         <div className="flex gap-4 mb-8">
-          <Link
+          {/* <Link
             href="/models/model1"
             className="bg-gray-800 text-white px-6 py-3 rounded-md  hover:bg-gray-700 "
           >
@@ -28,7 +28,7 @@ const TryFree: React.FC = () => {
           >
             <div className="text-center">Model 2</div>
             <span className="text-sm">text-to-img</span>
-          </Link>
+          </Link> */}
           <Link
             href="/phi"
             className="bg-gray-800 text-white px-6 py-3 rounded-md  hover:bg-gray-700 "
@@ -55,6 +55,15 @@ const TryFree: React.FC = () => {
               <span> Petals </span>
             </div>
             <span className="text-sm">text-to-text</span>
+          </Link>
+          <Link
+            href="/segmentAnything"
+            className="bg-gray-800 text-white px-6 py-3 rounded-md  hover:bg-gray-700 "
+          >
+            <div className="text-center">
+              <span> Segment Anything </span>
+            </div>
+            <span className="text-sm">Image segmentation</span>
           </Link>
         </div>
         <div className="text-center">
