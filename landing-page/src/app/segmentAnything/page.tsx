@@ -119,7 +119,7 @@ const Home: React.FC = () => {
         return;
       }
 
-      const img = new Image();
+      const img = document.createElement("img");
       img.crossOrigin = "anonymous";
 
       img.onload = () => {
