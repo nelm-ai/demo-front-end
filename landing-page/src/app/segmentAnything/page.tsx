@@ -12,6 +12,7 @@ const Home: React.FC = () => {
   const [hasImage, setHasImage] = useState(false);
   const [isSegmenting, setIsSegmenting] = useState(false);
   const [isEmbedding, setIsEmbedding] = useState(false);
+  const [embeddingCreated, setEmbeddingCreated] = useState(false);
   const [currentImageURL, setCurrentImageURL] = useState("");
   const [pointArr, setPointArr] = useState<[number, number, boolean][]>([]);
   const [bgPointMode, setBgPointMode] = useState(false);
@@ -41,6 +42,18 @@ const Home: React.FC = () => {
   const samWorker = useRef<Worker | null>(null);
 
   useEffect(() => {
+    // if (!samWorker.current) {
+    //   samWorker.current = new Worker(
+    //     new URL("../workers/segmentAnythingWorker.js", import.meta.url),
+    //     {
+    //       type: "module",
+    //     }
+    //   );
+    // }
+    ctxCanvasRef.current = canvasRef.current.getContext("2d");
+    ctxMaskRef.current = maskRef.current.getContext("2d");
+  }, []);
+  useEffect(() => {
     if (!samWorker.current) {
       samWorker.current = new Worker(
         new URL("../workers/segmentAnythingWorker.js", import.meta.url),
@@ -48,39 +61,45 @@ const Home: React.FC = () => {
           type: "module",
         }
       );
+      console.log("worker created");
     }
-    ctxCanvasRef.current = canvasRef.current.getContext("2d");
-    ctxMaskRef.current = maskRef.current.getContext("2d");
+    // return () => {
+    //   if (samWorker.current) {
+    //     samWorker.current.terminate();
+    //     console.log("Worker terminated");
+    //   }
+    // };
   }, []);
 
   const segmentPoints = async (modelURL, modelID, imageURL, points) => {
     return new Promise((resolve, reject) => {
-      const samWorker = new Worker(
-        new URL("../workers/segmentAnythingWorker.js", import.meta.url),
-        {
-          type: "module",
-        }
-      );
+      if (!samWorker.current) {
+        reject(new Error("Worker not initialized"));
+        return;
+      }
+      console.log("Here");
       function messageHandler(event) {
         console.log(event.data);
+
         if ("status" in event.data) {
           updateStatus(event.data);
         }
         if ("error" in event.data) {
-          samWorker.removeEventListener("message", messageHandler);
+          samWorker.current.removeEventListener("message", messageHandler);
           reject(new Error(event.data.error));
         }
         if (event.data.status === "complete-embedding") {
-          samWorker.removeEventListener("message", messageHandler);
+          samWorker.current.removeEventListener("message", messageHandler);
           resolve();
         }
         if (event.data.status === "complete") {
-          samWorker.removeEventListener("message", messageHandler);
+          samWorker.current.removeEventListener("message", messageHandler);
           resolve(event.data.output);
         }
       }
-      samWorker.addEventListener("message", messageHandler);
-      samWorker.postMessage({
+      samWorker.current.addEventListener("message", messageHandler);
+      // samWorker.current.onmessage = messageHandler;
+      samWorker.current.postMessage({
         modelURL,
         modelID,
         imageURL,
@@ -565,7 +584,7 @@ const Home: React.FC = () => {
                   ></canvas>
                 </div>
                 <div className="text-right py-2">
-                  <button
+                  {/* <button
                     id="share-btn"
                     className="bg-white rounded-md hover:outline outline-orange-200 disabled:opacity-50 invisible"
                   >
@@ -575,7 +594,7 @@ const Home: React.FC = () => {
                       width={100}
                       height={30}
                     />
-                  </button>
+                  </button> */}
                   <button
                     id="download-btn"
                     title="Copy result (.png)"
