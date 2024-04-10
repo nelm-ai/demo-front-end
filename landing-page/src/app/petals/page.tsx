@@ -11,16 +11,20 @@ const Petals: React.FC = () => {
   >([{ sender: "bot", text: "Hello, how can I help you?" }]);
   const [inputValue, setInputValue] = useState("");
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [sessionOpened, setSessionOpened] = useState(false);
 
   useEffect(() => {
+    console.log("Setting up WebSocket connection");
     const newWs = new WebSocket("wss://chat.petals.dev/api/v2/generate");
     newWs.onopen = () => {
       console.log("WebSocket connection established");
     };
     newWs.onmessage = (event) => {
+      console.log("Received message from WebSocket:", event.data);
       const response = JSON.parse(event.data);
       if (response.ok) {
         if (response.outputs) {
+          console.log("Updating messages with bot response");
           setMessages((prevMessages) => [
             ...prevMessages,
             { sender: "bot", text: response.outputs },
@@ -40,6 +44,7 @@ const Petals: React.FC = () => {
     setWs(newWs);
 
     return () => {
+      console.log("Cleaning up WebSocket connection");
       if (newWs.readyState === WebSocket.OPEN) {
         newWs.close();
       }
@@ -53,13 +58,23 @@ const Petals: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (inputValue.trim() && ws) {
-      ws.send(
-        JSON.stringify({
-          type: "open_inference_session",
-          model: "stabilityai/StableBeluga2",
-          max_length: 30,
-        })
-      );
+      console.log("Updating messages with user input: ", inputValue);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: "user", text: inputValue.trim() },
+      ]);
+      if (!sessionOpened) {
+        console.log("Sending open_inference_session message");
+        ws.send(
+          JSON.stringify({
+            type: "open_inference_session",
+            model: "stabilityai/StableBeluga2",
+            max_length: 200,
+          })
+        );
+        setSessionOpened(true);
+      }
+      console.log("Sending generate message with: ", inputValue.trim());
       ws.send(
         JSON.stringify({
           type: "generate",
@@ -70,10 +85,7 @@ const Petals: React.FC = () => {
           top_p: 0.9,
         })
       );
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: "user", text: inputValue.trim() },
-      ]);
+
       setInputValue("");
     }
   };
