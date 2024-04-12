@@ -27,6 +27,8 @@ export default function Home() {
   const [status, setStatus] = useState("");
   const [outputCounter, setOutputCounter] = useState("");
 
+  const dialogueRef = useRef<HTMLDivElement>(null);
+
   const worker = useRef<Worker | null>(null);
 
   useEffect(() => {

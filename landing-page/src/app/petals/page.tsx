@@ -1,5 +1,5 @@
 "use client"; // This is a client component 👈🏽
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SubscribeBanner from "@/Components/SubscribeBanner";
 import ModelButtons from "@/Components/ModelButton";
 
@@ -12,6 +12,14 @@ const Petals: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [sessionOpened, setSessionOpened] = useState(false);
+  const [totalElapsed, setTotalElapsed] = useState(0);
+  const [tokenCount, setTokenCount] = useState(0);
+  const [forceStop, setForceStop] = useState(false);
+  //const [currentText, setCurrentText] = useState("");
+  const stop_seq = "." || "/n" || "</s>" || "!" || "?";
+  //const forceStop
+
+  const dialogueRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log("Setting up WebSocket connection");
@@ -19,28 +27,82 @@ const Petals: React.FC = () => {
     newWs.onopen = () => {
       console.log("WebSocket connection established");
     };
+
+    let lastMessageTime: number | null = null;
+    let currentText = "";
+    let isGenerating = false; // Flag variable
+
+    const startGeneration = (inputs: string) => {
+      if (isGenerating) return; // Don't start a new generation if one is already in progress
+
+      isGenerating = true;
+      lastMessageTime = null;
+      currentText = "";
+
+      newWs.send(
+        JSON.stringify({
+          type: "generate",
+          inputs: inputs,
+          max_new_tokens: 1,
+          do_sample: 1,
+          stop_sequence: stop_seq,
+        })
+      );
+    };
+
     newWs.onmessage = (event) => {
-      console.log("Received message from WebSocket:", event.data);
       const response = JSON.parse(event.data);
-      if (response.ok) {
-        if (response.outputs) {
-          console.log("Updating messages with bot response");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { sender: "bot", text: response.outputs },
-          ]);
+      console.log("Received message from WebSocket:", event.data);
+      if (!response.ok) {
+        console.log(response.traceback);
+        isGenerating = false;
+        return;
+      }
+
+      if (lastMessageTime != null) {
+        setTotalElapsed(
+          (prevElapsed) => prevElapsed + performance.now() - lastMessageTime
+        );
+        setTokenCount((prevCount) => prevCount + response.token_count);
+      }
+      lastMessageTime = performance.now();
+
+      currentText += response.outputs;
+      console.log("Updating messages with bot response", response.outputs);
+      setMessages((prevMessages) => {
+        const lastMessage = prevMessages[prevMessages.length - 1];
+        if (lastMessage.sender === "bot") {
+          return [
+            ...prevMessages.slice(0, -1),
+            { sender: "bot", text: lastMessage.text + response.outputs },
+          ];
+        } else {
+          return [...prevMessages, { sender: "bot", text: "" }];
         }
-      } else {
-        console.error("Error:", response.traceback);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: "bot", text: "Error: " + response.traceback },
-        ]);
+      });
+
+      if (response.stop) {
+        console.log("Stop generating");
+        isGenerating = false;
+      } else if (tokenCount >= 1) {
+        const speed = tokenCount / (totalElapsed / 1000);
+        console.log(`Speed: ${speed.toFixed(1)} tokens/sec`);
+        console.log("Generate called inside onmessage");
+        newWs.send(
+          JSON.stringify({
+            type: "generate",
+            max_new_tokens: 1,
+            do_sample: 1,
+            stop_sequence: stop_seq,
+          })
+        );
       }
     };
+
     newWs.onclose = () => {
       console.log("WebSocket connection closed");
     };
+
     setWs(newWs);
 
     return () => {
@@ -50,10 +112,6 @@ const Petals: React.FC = () => {
       }
     };
   }, []);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputValue(event.target.value);
-  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -70,6 +128,7 @@ const Petals: React.FC = () => {
             type: "open_inference_session",
             model: "stabilityai/StableBeluga2",
             max_length: 500,
+            stop_sequence: stop_seq,
           })
         );
         setSessionOpened(true);
@@ -79,16 +138,17 @@ const Petals: React.FC = () => {
         JSON.stringify({
           type: "generate",
           inputs: inputValue.trim(),
-          //max_length: 30,
-          max_new_tokens: 15,
+          max_new_tokens: 1,
           do_sample: 1,
-          temperature: 0.6,
-          top_p: 0.9,
+          stop_sequence: stop_seq,
         })
       );
-
       setInputValue("");
     }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(event.target.value);
   };
 
   return (
@@ -104,7 +164,10 @@ const Petals: React.FC = () => {
               using the Stable Beluga2 model.
             </p>
           </div>
-          <div className="flex flex-col h-96 overflow-y-auto p-4 bg-gray-200 rounded-t-md">
+          <div
+            ref={dialogueRef}
+            className="flex flex-col h-96 overflow-y-auto p-4 bg-gray-200 rounded-t-md"
+          >
             {messages.map((message, index) => (
               <div
                 key={index}
