@@ -69,7 +69,7 @@ const Petals: React.FC = () => {
           JSON.stringify({
             type: "open_inference_session",
             model: "stabilityai/StableBeluga2",
-            max_length: 200,
+            max_length: 500,
           })
         );
         setSessionOpened(true);
@@ -79,7 +79,8 @@ const Petals: React.FC = () => {
         JSON.stringify({
           type: "generate",
           inputs: inputValue.trim(),
-          max_length: 30,
+          //max_length: 30,
+          max_new_tokens: 15,
           do_sample: 1,
           temperature: 0.6,
           top_p: 0.9,
