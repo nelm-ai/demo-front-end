@@ -16,8 +16,8 @@ const Petals: React.FC = () => {
   const [tokenCount, setTokenCount] = useState(0);
   const [forceStop, setForceStop] = useState(false);
   //const [currentText, setCurrentText] = useState("");
-  const stop_seq = "." || "/n" || "</s>" || "!" || "?";
-  //const forceStop
+  //const stop_seq = ".?/n!" || "/n" || "</s>" || "!" || "?";
+  const stop_seq = [".", "/n", "</s>", "!", "?"];
 
   const dialogueRef = useRef<HTMLDivElement>(null);
 
@@ -140,7 +140,9 @@ const Petals: React.FC = () => {
           inputs: inputValue.trim(),
           max_new_tokens: 1,
           do_sample: 1,
-          stop_sequence: stop_seq,
+          stop_sequence: ".",
+          extra_stop_sequences: "?",
+          // extra_stop_sequences: "\n",
         })
       );
       setInputValue("");
